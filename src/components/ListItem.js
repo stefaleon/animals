@@ -3,13 +3,30 @@ import { Text , TouchableWithoutFeedback, View } from 'react-native';
 import { CardSection } from './common';
 import * as actions from '../actions';
 import { connect } from 'react-redux';
+import { UIManager,  Platform, LayoutAnimation } from 'react-native';
 
 
 class ListItem extends Component {
+  constructor() {
+    super();
+    if (Platform.OS === 'android') {
+        UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }
+
+  componentWillUpdate() {
+    LayoutAnimation.spring();
+  }
+
+
   renderDescription() {
     if ( this.props.expanded ) {
       return (
-        <Text>{this.props.animal.description}</Text>
+        <CardSection>
+          <Text style={{ flex:1 }}>
+            {this.props.animal.description}
+          </Text>
+        </CardSection>
       );
     }
   }

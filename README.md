@@ -401,3 +401,39 @@ renderDescription() {
 ```
 {this.renderDescription()}
 ```
+
+
+
+
+&nbsp;
+## 05 Style and animate
+
+* Wrap the renderDescription Text in a CardSection in order to give it some padding and a bottom border. Flex it so that lines wrap properly.
+
+```
+return (
+  <CardSection>
+    <Text style={{ flex:1 }}>
+      {this.props.animal.description}
+    </Text>
+  </CardSection>
+);
+```
+
+* Import LayOutAnimation and add a spring effect with the componentWillUpdate lifecycle method.  
+
+```
+import { UIManager,  Platform, LayoutAnimation } from 'react-native';
+```
+```
+constructor() {
+  super();
+  if (Platform.OS === 'android') {
+      UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
+
+componentWillUpdate() {
+  LayoutAnimation.spring();
+}
+```
