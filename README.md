@@ -96,7 +96,7 @@ sdk.dir=C\:\\Users\\YOUR_USER_ACCOUNT\\AppData\\Local\\Android\\Sdk
 
 
 &nbsp;
-## 03 Header and AnimalReducer
+## 02 Header and AnimalReducer
 
 * Get a copy of the *./Components/common* folder from the [*auth*](https://github.com/stefaleon/Authentication-with-React-Native) app.
 
@@ -130,4 +130,136 @@ import AnimalReducer from './AnimalReducer';
 export default combineReducers({
   animals: AnimalReducer
 });
+```
+
+
+&nbsp;
+## 03 Map state to props and list titles
+
+* Connect to the store. Create the *AnimalsList.js* file inside the */src/components* folder. Connect to the Redux store and retrieve the *animals* piece of state.  
+
+  * The react-redux *connect()* function takes *mapStateToProps* as an argument.
+
+  * The return of *connect(mapStateToProps)* is also a function which takes *AnimalsList* as its parameter. The result  is being exported by *AnimalsList.js*
+
+  * The *mapStateToProps* function takes the *state* as its parameter and returns an object containing the *state.animals*. These are passed to *AnimalsList* as props.
+
+  * On the componentWillMount lifecycle method these props are passed to a ListView, via boilerplate code. Rows' changes are monitored and the ListView.DataSource is provided with appropriate data.
+
+  * Define the howToRenderRow method in order to instruct the ListView rergarding row rendering. Temporarily returns an empty list.
+
+
+*/src/components/AnimalsList.js*
+```
+import React, { Component } from 'react';
+import { ListView } from 'react-native';
+import { connect } from 'react-redux';
+
+class AnimalsList extends Component {
+  componentWillMount() {
+    const ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2
+    });
+
+    this.dataSource = ds.cloneWithRows(this.props.animals);
+  }
+
+  howToRenderRow() {
+    return [];
+  }
+
+  render() {
+    return(
+      <ListView
+        dataSource = {this.dataSource}
+        renderRow = {this.howToRenderRow}
+       />
+    );
+  }
+}
+
+const mapStateToProps = state => {
+  return { animals: state.animals };
+};
+
+export default connect(mapStateToProps)(AnimalsList);
+```
+
+* In *App.js*
+
+```
+import AnimalsList from './components/AnimalsList';
+```
+```
+export default class App extends Component<{}> {
+  render() {
+    return (
+      <Provider store={createStore(reducers)} >
+        <View>
+          <Header headerText="Animals" />
+          <AnimalsList />
+          <Text>
+            The animals are now coming from the Redux store to the React View.
+          </Text>
+        </View>
+      </Provider>
+    );
+  }
+}
+```
+
+
+### Display the titles
+
+* Create the *ListItem.js* file inside the */src/components* folder. Add appropriate JSX code in order to display the title property of the JSON data object. Reuse the CardSection component from the common components. The *animal* property will be defined in the next paragraph.
+
+*/src/components/ListItem.js*
+```
+import React, { Component } from 'react';
+import { Text } from 'react-native';
+import { CardSection } from './common';
+
+export default class ListItem extends Component {
+  render() {
+    return (
+      <CardSection>
+        <Text>{this.props.animal.title}</Text>        
+      </CardSection>
+    );
+  }
+}
+```
+
+
+* In *AnimalsList.js* add the *animal* parameter in *howToRenderRow()* and also pass it as a prop to the *ListItem*.
+
+```
+import ListItem from './ListItem';
+```
+
+```
+howToRenderRow(animal) {
+  return <ListItem animal={animal}/>
+}
+```
+
+
+* Style the Text in ListItem.
+
+```
+<Text style={styles.titleStyle}>
+```
+```
+const styles = {
+  titleStyle: {
+    fontSize: 20,
+    paddingLeft: 15
+  }
+};
+```
+
+* Flex the View in App.
+
+```
+<View style={{ flex:1 }}>
 ```
