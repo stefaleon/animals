@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
+import AnimalReducer from './AnimalReducer';
 
 export default combineReducers({
-  animalsReducer: () => []
+  animals: AnimalReducer
 });

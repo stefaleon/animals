@@ -68,7 +68,7 @@ export default class App extends Component<{}> {
       <Provider store={createStore(reducers)} >
         <View>
           <Text>
-              Animals - React Native with Redux 
+              Animals - React Native with Redux
           </Text>
         </View>
       </Provider>
@@ -91,4 +91,43 @@ If it is not present, add it and fill in the location of the SDK folder, somethi
 
 ```
 sdk.dir=C\:\\Users\\YOUR_USER_ACCOUNT\\AppData\\Local\\Android\\Sdk
+```
+
+
+
+&nbsp;
+## 03 Header and AnimalReducer
+
+* Get a copy of the *./Components/common* folder from the [*auth*](https://github.com/stefaleon/Authentication-with-React-Native) app.
+
+* Import *Header* and use it in App.js.
+
+```
+import { Header } from './components/common';
+```
+
+```  
+    <Header headerText="Animals" />
+```
+
+* Add some animal data. In *./src/reducers* create *animals.json* which will contain the animals' data as a JSON object. Source: [San Diego Zoo](http://animals.sandiegozoo.org/animals)
+
+* In *./src/reducers* create *AnimalReducer.js*. It will be returning the list of animals. Import and export the data from './animals.json'.
+
+```
+import data from './animals.json';
+
+export default () => data;
+```
+
+
+* Wire AnimalReducer up in *./src/reducers/index.js*. The animals property of the combineReducers, gets the state from AnimalReducer.
+
+```
+import { combineReducers } from 'redux';
+import AnimalReducer from './AnimalReducer';
+
+export default combineReducers({
+  animals: AnimalReducer
+});
 ```
