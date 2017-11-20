@@ -263,3 +263,141 @@ const styles = {
 ```
 <View style={{ flex:1 }}>
 ```
+
+
+
+
+
+&nbsp;
+## 04 SelectionReducer, selectAnimal and expand row
+
+* In *./src/reducers* create *SelectionReducer.js*. Avoid undefined state in the beginning by setting initial state to null (implying that we have no specific library selected to begin with).
+
+*./src/reducers/SelectionReducer.js*
+```
+export default () => {
+  return null;  
+};
+```
+
+* Wire it up in *./src/reducers/index.js*. Import and attach it to the *selectedAnimalId* property inside combineReducers.
+
+```
+import SelectionReducer from './SelectionReducer';
+```
+```
+export default combineReducers({
+  animals: AnimalReducer,
+  selectedAnimalId: SelectionReducer
+});
+```
+
+* Create the *actions* folder and the *src/actions/index.js* file. It exports the action creator function *selectAnimal*, which returns the action with the *select_animal* type. The *animalId* argument passed to this action creator function, is being attached to the payload property of the returned action object.
+
+*src/actions/index.js*
+```
+export const selectAnimal = (animalId) => {
+  return {
+    type: 'select_animal',
+    payload: animalId
+  };
+};
+```
+
+* In ListItem.js import all actions as *actions*.
+
+```
+import * as actions from '../actions';
+```
+
+* Import the connect helper.
+
+```
+import { connect } from 'react-redux';
+```
+
+* Setup the connection. There is not mapStateToProps set up yet, so the first patrameter of connect() is null. The second parameter is the *actions* object.
+
+```
+export default connect(null, actions)(ListItem);
+```
+
+
+* Now the action creator function *selectAnimal* is connected to the *ListItem* component and is available as props to be called when a touch event occurs. A touchable component is required in order to receive the touch event. Import TouchableWithoutFeedback, which is appropriate for this case. Also import the View object.
+
+```
+import { Text , TouchableWithoutFeedback, View } from 'react-native';
+```
+
+* Wrap the return in a TouchableWithoutFeedback block, and also internally to a View so that another CardSection can be added later. Call the *selectAnimal* action creator on the onPress event and pass it the particular current animal's Id.
+
+```
+class ListItem extends Component {
+  render() {
+    return (
+      <TouchableWithoutFeedback
+        onPress={ () => this.props.selectAnimal(this.props.animal.id) }
+      >
+        <View>
+          <CardSection>
+            <Text style={styles.titleStyle}>
+              {this.props.animal.title}
+            </Text>
+          </CardSection>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
+```
+
+* Return the selected animal's Id. Edit SelectionReducer.js so that it returns the action's payload when the dispatched action comes from selectAnimal.
+
+*./src/reducers/SelectionReducer.js*
+```
+export default (state  =  null, action) => {
+  switch (action.type) {
+    case 'select_animal':
+      return action.payload;
+    default:
+      return state;
+  }
+};
+```
+
+### Expand the selected row
+
+* In ListItem.js, compare the state's selectedAnimalId item to the own props animal id, inside the mapStateToProps function which takes the state as its first argument and ownProps as the second argument. The *expanded* flag is returned to the component.
+
+```
+const mapStateToProps = (state, ownProps) => {
+  const expanded = state.selectedAnimalId === ownProps.animal.id;
+  return { expanded };
+};
+```
+
+* Pass mapStateToProps as the first argument to the connect handler.
+
+```
+export default connect(mapStateToProps, actions)(ListItem);
+```
+
+
+* Define the renderDescription helper function. The animal description will be displayed if the passed to component's props expanded flag is true.
+
+```
+renderDescription() {
+  if ( this.props.expanded ) {
+    return (
+      <Text>{this.props.animal.description}</Text>
+    );
+  }
+}
+```
+
+
+* Display the result of renderDescription() inside the ListItem's render result.
+
+```
+{this.renderDescription()}
+```
